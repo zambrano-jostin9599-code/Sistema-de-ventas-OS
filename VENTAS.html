@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Ventas</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <div class="login-logo">
+        <span class="login-icon">🔐</span>
+        <h2>Control de Ventas</h2>
+        <p id="loginSubtitle">Ingresa tus credenciales para continuar</p>
+      </div>
+
+      <!-- Formulario de inicio de sesión -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginUser">Usuario</label>
+          <input type="text" id="loginUser" placeholder="Nombre de usuario" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPass">Contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password" required />
+            <button type="button" class="toggle-pass" id="togglePass">👁</button>
+          </div>
+        </div>
+        <div class="login-error" id="loginError" style="display:none;">Usuario o contraseña incorrectos.</div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;">Ingresar</button>
+        <div style="text-align:center;margin-top:10px;">
+          <button type="button" class="btn-link" id="forgotBtn" style="font-size:12px;font-weight:400;">¿Olvidaste tu contraseña?</button>
+        </div>
+      </form>
+
+      <!-- Formulario de registro -->
+      <form id="registerForm" style="display:none;">
+        <div class="form-group">
+          <label for="regUser">Usuario</label>
+          <input type="text" id="regUser" placeholder="Elige un nombre de usuario" autocomplete="off" required />
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Correo electrónico</label>
+          <input type="email" id="regEmail" placeholder="tu@correo.com" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label for="regPass">Contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" id="regPass" placeholder="Crea una contraseña" autocomplete="new-password" required />
+            <button type="button" class="toggle-pass" id="toggleRegPass">👁</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="regPass2">Confirmar contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" id="regPass2" placeholder="Repite la contraseña" autocomplete="new-password" required />
+            <button type="button" class="toggle-pass" id="toggleRegPass2">👁</button>
+          </div>
+        </div>
+        <div class="login-error" id="registerError" style="display:none;"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;">Crear cuenta</button>
+      </form>
+
+      <!-- Formulario nueva contraseña (desde link) -->
+      <form id="newPassForm" style="display:none;">
+        <p style="color:#9ca3af;font-size:13px;margin-bottom:16px;">Ingresa tu nueva contraseña.</p>
+        <div class="form-group">
+          <label for="newPass1">Nueva contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" id="newPass1" placeholder="Nueva contraseña" required />
+            <button type="button" class="toggle-pass" id="toggleNewPass1">👁</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newPass2">Confirmar contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" id="newPass2" placeholder="Repite la contraseña" required />
+            <button type="button" class="toggle-pass" id="toggleNewPass2">👁</button>
+          </div>
+        </div>
+        <div class="login-error" id="newPassError" style="display:none;"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;">Guardar nueva contraseña</button>
+      </form>
+
+      <!-- Formulario de recuperación -->
+      <form id="recoverForm" style="display:none;">
+        <p style="color:#9ca3af;font-size:13px;margin-bottom:16px;">Ingresa tu correo y te enviaremos tu contraseña.</p>
+        <div class="form-group">
+          <label for="recoverEmail">Correo electrónico</label>
+          <input type="email" id="recoverEmail" placeholder="tu@correo.com" required />
+        </div>
+        <div class="login-error" id="recoverError" style="display:none;"></div>
+        <div class="login-success" id="recoverSuccess" style="display:none;">Correo enviado. Revisa tu bandeja de entrada.</div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="btnRecoverSend">Enviar contraseña</button>
+      </form>
+
+      <div class="login-switch">
+        <span id="switchText">¿No tienes cuenta?</span>
+        <button type="button" class="btn-link" id="switchBtn">Regístrate</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="appContent" style="display:none;">
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1>Control de Ventas</h1>
+          <span class="subtitle">Panel de seguimiento</span>
+        </div>
+        <div class="header-right">
+          <div class="stat-card">
+            <span class="stat-label">Total Ventas</span>
+            <span class="stat-value" id="totalVentas">$0.00</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">N° Transacciones</span>
+            <span class="stat-value" id="totalTransacciones">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Promedio Venta</span>
+            <span class="stat-value" id="promedioVenta">$0.00</span>
+          </div>
+          <button class="btn btn-logout" id="btnConfig" title="Configurar correo">Configurar correo</button>
+          <button class="btn btn-logout" id="btnLogout" title="Cerrar sesión">Cerrar sesión</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="form-section">
+        <div class="card">
+          <h2 class="card-title">Nueva Venta</h2>
+          <form id="ventaForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fecha">Fecha</label>
+                <input type="date" id="fecha" required />
+              </div>
+              <div class="form-group">
+                <label for="cliente">Cliente</label>
+                <input type="text" id="cliente" placeholder="Nombre del cliente" required />
+              </div>
+              <div class="form-group">
+                <label for="producto">Producto / Servicio</label>
+                <input type="text" id="producto" placeholder="Descripción del producto" required />
+              </div>
+              <div class="form-group">
+                <label for="categoria">Categoría</label>
+                <select id="categoria" required>
+                  <option value="">Seleccionar...</option>
+                  <option value="Producto">Producto</option>
+                  <option value="Servicio">Servicio</option>
+                  <option value="Digital">Digital</option>
+                  <option value="Consultoría">Consultoría</option>
+                  <option value="Ropa y Accesorios">Ropa y Accesorios</option>
+                  <option value="Alimentos y Bebidas">Alimentos y Bebidas</option>
+                  <option value="Tecnología">Tecnología</option>
+                  <option value="Salud y Belleza">Salud y Belleza</option>
+                  <option value="Hogar y Decoración">Hogar y Decoración</option>
+                  <option value="Educación">Educación</option>
+                  <option value="Transporte y Logística">Transporte y Logística</option>
+                  <option value="Entretenimiento">Entretenimiento</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="cantidad">Cantidad</label>
+                <input type="number" id="cantidad" min="1" value="1" required />
+              </div>
+              <div class="form-group">
+                <label for="precio">Precio Unitario ($)</label>
+                <input type="number" id="precio" min="0" step="0.01" placeholder="0.00" required />
+              </div>
+              <div class="form-group">
+                <label for="estado">Estado de Pago</label>
+                <select id="estado" required>
+                  <option value="Pagado">Pagado</option>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="notas">Notas</label>
+                <input type="text" id="notas" placeholder="Observaciones (opcional)" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="btnGuardar">Registrar Venta</button>
+              <button type="button" class="btn btn-secondary" id="btnCancelar" style="display:none;">Cancelar Edición</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="chart-section">
+        <div class="card">
+          <h2 class="card-title">Ventas por Categoría</h2>
+          <div class="chart-container">
+            <canvas id="chartCategorias"></canvas>
+          </div>
+          <div class="empty-state" id="emptyChart">
+            <div class="empty-icon">📊</div>
+            <p>No hay datos suficientes para mostrar el gráfico.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="table-section">
+        <div class="card">
+          <div class="table-header">
+            <h2 class="card-title">Registro de Ventas</h2>
+            <div class="table-actions">
+              <div class="search-box">
+                <input type="text" id="busqueda" placeholder="Buscar..." />
+              </div>
+              <select id="filtroEstado">
+                <option value="">Todos los estados</option>
+                <option value="Pagado">Pagado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+              <button class="btn btn-outline" id="btnExportar">Exportar CSV</button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table id="tablaVentas">
+              <thead>
+                <tr>
+                  <th data-col="fecha">Fecha <span class="sort-icon">↕</span></th>
+                  <th data-col="cliente">Cliente <span class="sort-icon">↕</span></th>
+                  <th data-col="producto">Producto</th>
+                  <th data-col="categoria">Categoría</th>
+                  <th data-col="cantidad">Cant.</th>
+                  <th data-col="precio">P. Unit.</th>
+                  <th data-col="total">Total <span class="sort-icon">↕</span></th>
+                  <th data-col="estado">Estado</th>
+                  <th>Notas</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tablaBody">
+              </tbody>
+            </table>
+            <div class="empty-state" id="emptyState">
+              <div class="empty-icon">📋</div>
+              <p>No hay ventas registradas aún.</p>
+              <p class="empty-sub">Registra tu primera venta usando el formulario de arriba.</p>
+            </div>
+          </div>
+
+          <div class="table-footer" id="tableFooter" style="display:none;">
+            <span id="countInfo"></span>
+            <div class="totals-row">
+              <strong>Total filtrado: <span id="totalFiltrado">$0.00</span></strong>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-overlay" id="modalConfig" style="display:none;">
+      <div class="modal modal-config">
+        <h3>Configurar envio de correo</h3>
+        <p>Ingresa tus credenciales de <strong>EmailJS</strong> para activar el envio automatico de correos. Se guardan en este navegador.</p>
+        <div class="config-steps">
+          <span>1. Crea cuenta gratis en <a href="https://www.emailjs.com" target="_blank">emailjs.com</a></span>
+          <span>2. Crea un <strong>Email Service</strong> con tu correo (Gmail, Outlook...)</span>
+          <span>3. Crea un <strong>Email Template</strong> con las variables: <code>{{to_email}}</code> <code>{{to_name}}</code> <code>{{user_name}}</code> <code>{{password}}</code></span>
+          <span>4. Pega los datos aqui abajo</span>
+        </div>
+        <form id="configForm">
+          <div class="config-section-title">Configuracion de correo (EmailJS)</div>
+          <div class="form-group">
+            <label for="cfgPublicKey">Public Key</label>
+            <input type="text" id="cfgPublicKey" placeholder="Ej: abc123XYZ..." />
+          </div>
+          <div class="form-group">
+            <label for="cfgServiceId">Service ID</label>
+            <input type="text" id="cfgServiceId" placeholder="Ej: service_xxxxxx" />
+          </div>
+          <div class="form-group">
+            <label for="cfgTemplateId">Template ID</label>
+            <input type="text" id="cfgTemplateId" placeholder="Ej: template_xxxxxx" />
+          </div>
+          <div class="config-section-title" style="margin-top:20px;">Base de datos (Firebase)</div>
+          <div class="config-steps">
+            <span>1. Ve a <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></span>
+            <span>2. Crea un proyecto → agrega una app Web</span>
+            <span>3. Copia los datos del objeto <code>firebaseConfig</code></span>
+            <span>4. En Firestore Database → crea base de datos en modo de prueba</span>
+          </div>
+          <div class="form-group">
+            <label for="cfgFbApiKey">API Key</label>
+            <input type="text" id="cfgFbApiKey" placeholder="AIzaSy..." />
+          </div>
+          <div class="form-group">
+            <label for="cfgFbProjectId">Project ID</label>
+            <input type="text" id="cfgFbProjectId" placeholder="mi-proyecto-xxxxx" />
+          </div>
+          <div class="form-group">
+            <label for="cfgFbAppId">App ID</label>
+            <input type="text" id="cfgFbAppId" placeholder="1:123456:web:abcdef..." />
+          </div>
+          <div class="config-status" id="cfgStatus" style="display:none;"></div>
+          <div class="modal-actions" style="margin-top:16px;">
+            <button type="submit" class="btn btn-primary">Guardar configuracion</button>
+            <button type="button" class="btn btn-secondary" id="btnCloseConfig">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalConfirm" style="display:none;">
+      <div class="modal">
+        <h3>Confirmar eliminación</h3>
+        <p>¿Estás segura de que deseas eliminar esta venta? Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+          <button class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
+          <button class="btn btn-secondary" id="btnCancelDelete">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
